@@ -12,6 +12,7 @@ dependencies = [
 
 [project.scripts]
 png2ppt-init-job = "scripts.init_job:main"
+png2ppt-asset-index = "scripts.asset_index:main"
 png2ppt-quality-check = "scripts.pptx_quality_check:main"
 png2ppt-regression-compare = "scripts.regression_compare:main"
 png2ppt-style-memory = "scripts.style_memory:main"

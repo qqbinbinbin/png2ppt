@@ -96,6 +96,16 @@ python3 scripts/regression_compare.py \
   --fail-on-regression
 ```
 
+为本地私有 PPT 资产库建立元数据索引：
+
+```bash
+python3 scripts/asset_index.py build assets/raw --out assets/index
+python3 scripts/asset_index.py search assets/index --kind slide --tag consulting_line --limit 20
+python3 scripts/asset_index.py search assets/index --kind media --tag small_icon --limit 20
+```
+
+用户私有 raw 资产和由它们派生出的索引默认都是本地工作产物。不要提交这些文件，也不要把萃取 parts 移入公开 skill，除非用户明确批准这次提升。
+
 ## 质量标准
 
 这个 skill 把视觉质量作为可度量对象：
@@ -116,4 +126,4 @@ python3 -m py_compile scripts/*.py
 npx skills add . --list
 ```
 
-不要提交用户交付物、样例工作目录、渲染预览或项目专用重建脚本。可复用流程放在本仓库，一次性的页面坐标和模板脚本放在用户项目工作区。
+不要提交用户交付物、样例工作目录、渲染预览、私有资产索引、raw 资产 deck、私有萃取 parts 或项目专用重建脚本。可复用流程放在本仓库，一次性的页面坐标和模板脚本放在用户项目工作区。

@@ -25,7 +25,7 @@
 1. 先识别源图中的文字、结构几何、图标、复杂装饰和位图区域。
 2. 初始化输出目录：最终 PPTX 放在源 PNG 旁边；轮次、审计、规格、日志、预览和临时文件放在 `png2ppt/<job-name>/work/`。
 3. 重建前运行 `scripts/style_profile.py`，提取背景、色板、边缘密度、线条密度、内容块、文本块和首选策略。
-4. 如果存在风格记忆，使用 `style_memory.py nearest` 查找相似样例，但不要强行套模板。
+4. 如果存在风格记忆，使用 `style_memory.py nearest` 查找相似样例；如果存在本地资产索引，使用 `asset_index.py search` 查找可复用线形、图标和装饰资产。但不要强行套模板。
 5. 锁定验证范围。若源图来自 PPTX 内嵌图片，应提取精确位图，而不是比较整页预览。
 6. 重建时保留标题、文字、面板、线条、表格和流程节点为可编辑对象；图标和复杂图形可用 PNG。
 7. 先重建结构，再处理图标：画布、面板、边框、分隔线、虚线、分栏，然后再放文字和语义图标。
@@ -33,6 +33,24 @@
 9. 移除任何源截图层，清理 PPTX 包中的陈旧媒体和关系。
 10. 运行视觉审计并迭代，直到结构指标通过，或明确说明剩余失败原因。
 11. 将决策、指标和下一步改进记录到任务报告和风格记忆中。
+
+## 本地资产索引
+
+大型 PPT 资产库可以用于语义图标替换、线形样式、咨询风格组件和装饰图案。先建立私有本地元数据索引，再按任务需要萃取具体 parts。
+
+```bash
+python3 /path/to/png2ppt/scripts/asset_index.py build assets/raw --out assets/index
+python3 /path/to/png2ppt/scripts/asset_index.py search assets/index --kind slide --tag consulting_line --limit 20
+python3 /path/to/png2ppt/scripts/asset_index.py search assets/index --kind media --tag small_icon --limit 20
+python3 /path/to/png2ppt/scripts/asset_index.py search assets/index --kind component --tag editable_line --limit 20
+```
+
+隐私规则：
+
+- 用户 raw 资产 deck 是私有文件，不能提交、上传或移动到 GitHub。
+- 从私有资产派生出的索引默认也是本地工作产物，除非用户明确批准，否则不要发布。
+- 萃取 parts 默认留在用户项目的 `assets/` 目录。
+- 只有在用户明确批准并确认可发布时，才可以把萃取 parts 提升到本 skill 的 `assets/` 目录。
 
 ## 自适应循环
 

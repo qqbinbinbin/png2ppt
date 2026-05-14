@@ -28,7 +28,7 @@ Practical ranking:
 1. Inspect the source: identify editable text, structural geometry, icons, decorative art, and complex bitmap regions.
 2. Initialize the output layout before creating artifacts: the final PPTX goes next to the source PNG; all rounds, audits, specs, logs, previews, and temporary renders go under `png2ppt/<job-name>/work/`.
 3. Create a style profile before reconstruction. Use `scripts/style_profile.py` to extract background, palette, edge density, line density, content blocks, text blocks, and a first-pass strategy recommendation.
-4. Query style memory when available. Use similar previous profiles as hints, not as a template override.
+4. Query style memory and local asset indexes when available. Use similar previous profiles and indexed assets as hints, not as a template override.
 5. Lock the validation scope. If the source image is embedded in PPTX, extract that exact bitmap instead of comparing full-slide previews.
 6. For slide reconstruction: keep headings, text, panels, lines, tables, and flow nodes as editable PPT objects; simplify or semantically replace icons when needed.
 7. Reconstruct structure before icons: canvas, panels, borders, separators, dotted lines, dividers, then text and icons.
@@ -36,6 +36,28 @@ Practical ranking:
 9. Remove any source screenshot/bitmap layer and prune stale media/relationships from the PPTX package.
 10. Run visual fidelity audit and iterate until structure metrics pass or remaining failures are explicitly explained.
 11. Record the run in both the job report and style memory so future runs can retrieve strategy/metric lessons from similar images.
+
+## Local Asset Indexes
+
+Large PPT asset libraries can be useful for semantic icon replacement, line motifs, consulting-grid components, and decorative art. Index them as private local metadata before extracting any reusable part.
+
+Use `scripts/asset_index.py` to build and query metadata-only indexes:
+
+```bash
+python3 /path/to/png2ppt/scripts/asset_index.py build assets/raw --out assets/index
+python3 /path/to/png2ppt/scripts/asset_index.py search assets/index --kind slide --tag consulting_line --limit 20
+python3 /path/to/png2ppt/scripts/asset_index.py search assets/index --kind media --tag small_icon --limit 20
+python3 /path/to/png2ppt/scripts/asset_index.py search assets/index --kind component --tag editable_line --limit 20
+```
+
+Privacy rules:
+
+- Raw user asset decks are private and must not be committed, uploaded, or moved into GitHub.
+- Indexes derived from private assets are local work products unless the user explicitly approves publishing them.
+- Extracted parts stay under the user's project `assets/` directory by default.
+- Promote extracted parts into this skill's `assets/` directory only after explicit user approval and publishability confirmation.
+
+For the index schema, read `references/asset-index.md`.
 
 ## Adaptive Loop
 

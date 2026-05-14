@@ -96,6 +96,16 @@ python3 scripts/regression_compare.py \
   --fail-on-regression
 ```
 
+Build a private metadata index for local PPT asset libraries:
+
+```bash
+python3 scripts/asset_index.py build assets/raw --out assets/index
+python3 scripts/asset_index.py search assets/index --kind slide --tag consulting_line --limit 20
+python3 scripts/asset_index.py search assets/index --kind media --tag small_icon --limit 20
+```
+
+Raw asset decks and indexes derived from private user assets are local work products by default. Do not commit them or move extracted parts into the public skill unless the user explicitly approves that promotion.
+
 ## Quality Bar
 
 The skill treats visual quality as measurable:
@@ -116,4 +126,4 @@ python3 -m py_compile scripts/*.py
 npx skills add . --list
 ```
 
-Do not commit user deliverables, sample work directories, rendered previews, or project-specific slide rebuilders. Keep reusable workflows in this repository and one-off reconstruction scripts in the user's project workspace.
+Do not commit user deliverables, sample work directories, rendered previews, private asset indexes, raw asset decks, extracted private parts, or project-specific slide rebuilders. Keep reusable workflows in this repository and one-off reconstruction scripts in the user's project workspace.
