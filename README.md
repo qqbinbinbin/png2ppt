@@ -11,16 +11,16 @@ It is designed for iterative, visual-diff-driven work instead of one-shot guessi
 
 ## Install
 
-Install from the public GitHub repository:
+Install from the public GitHub repository. This direct-install command works even before `skills.sh` search indexes the repository:
 
 ```bash
-npx skills add qqbinbinbin/png2ppt
+npx skills add qqbinbinbin/png2ppt --skill png2ppt -y
 ```
 
 Install globally:
 
 ```bash
-npx skills add qqbinbinbin/png2ppt -g
+npx skills add qqbinbinbin/png2ppt --skill png2ppt -g -y
 ```
 
 List the skill without installing:
