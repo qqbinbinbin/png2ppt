@@ -319,9 +319,9 @@ def recommend_strategy(metrics: dict) -> dict:
         reason = "dark textured structured page; editable overlay should be combined with a low-opacity/cropped texture or background layer"
         editable_priority = "medium_high"
     elif colors >= 9 and entropy >= 2.4 and edge_density < 0.055:
-        primary = "fidelity_png_placement"
-        reason = "many colors with low structural edge density suggests photo/illustration-like content"
-        editable_priority = "low"
+        primary = "texture_backed_hybrid_reconstruction"
+        reason = "many colors with low structural edge density suggests decorative/photo-like content; keep any texture controlled and rebuild editable text/geometry"
+        editable_priority = "medium"
     elif line_count >= 8 or block_count >= 10 or edge_density >= 0.07:
         primary = "native_or_hybrid_reconstruction"
         reason = "structured content with many lines/blocks is a good candidate for editable geometry"

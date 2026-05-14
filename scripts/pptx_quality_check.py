@@ -14,6 +14,10 @@ def check_pptx(
     source: Path | None = None,
     large_media_bytes: int = 500_000,
     require_next_to_source: bool = False,
+    require_editable: bool = False,
+    min_shapes: int = 0,
+    min_text_shapes: int = 0,
+    max_pictures: int | None = None,
 ) -> dict:
     pptx_path = pptx_path.expanduser().resolve()
     failures: list[str] = []
@@ -49,9 +53,19 @@ def check_pptx(
         total_shapes += shapes
         total_pictures += pictures
         total_text += text_shapes
+        if require_editable and shapes <= pictures and text_shapes == 0:
+            failures.append(f"slide_{idx}_not_editable")
 
     if len(prs.slides) == 0:
         failures.append("no_slides")
+    if total_shapes < min_shapes:
+        failures.append("too_few_shapes")
+    if total_text < min_text_shapes:
+        failures.append("too_few_text_shapes")
+    if max_pictures is not None and total_pictures > max_pictures:
+        failures.append("too_many_pictures")
+    if require_editable and total_shapes <= total_pictures:
+        failures.append("deck_not_editable")
 
     media = []
     with ZipFile(pptx_path) as archive:
@@ -87,6 +101,10 @@ def main() -> None:
     parser.add_argument("--out", type=Path)
     parser.add_argument("--large-media-bytes", type=int, default=500_000)
     parser.add_argument("--require-next-to-source", action="store_true")
+    parser.add_argument("--require-editable", action="store_true")
+    parser.add_argument("--min-shapes", type=int, default=0)
+    parser.add_argument("--min-text-shapes", type=int, default=0)
+    parser.add_argument("--max-pictures", type=int)
     parser.add_argument("--fail-on-large-media", action="store_true")
     args = parser.parse_args()
 
@@ -95,6 +113,10 @@ def main() -> None:
         source=args.source,
         large_media_bytes=args.large_media_bytes,
         require_next_to_source=args.require_next_to_source,
+        require_editable=args.require_editable,
+        min_shapes=args.min_shapes,
+        min_text_shapes=args.min_text_shapes,
+        max_pictures=args.max_pictures,
     )
     if args.fail_on_large_media and result["large_media"]:
         result["failures"].append("large_media")

@@ -52,7 +52,7 @@ Run the source image through `scripts/style_profile.py` before choosing a recons
 - Dominant foreground colors and rough color-family ratios.
 - Edge density, line density, dark-text ratio, and content/text block counts.
 - Horizontal/vertical line candidates and large content blocks.
-- A recommendation: PNG placement, simple native rebuild, hybrid rebuild, native/hybrid rebuild, or texture-backed hybrid rebuild.
+- A recommendation: simple native rebuild, hybrid rebuild, native/hybrid rebuild, consulting blueprint rebuild, or texture-backed hybrid rebuild.
 
 Use this profile to adapt to the current image. Do not infer that a new image uses the same grid, palette, font scale, or component system as earlier samples.
 
@@ -60,9 +60,9 @@ After profiling, query `scripts/style_memory.py nearest` if a memory file exists
 
 If the profile reports a dark background, high palette entropy, many fine edges, and neutral/orange foreground families, do not rebuild as flat shapes only. Use a texture-backed hybrid:
 
-- Add a cropped or synthesized low-opacity PNG background/texture layer for noise, glow, gradients, and material feel.
+- Add a cropped or synthesized low-opacity texture only for noise, glow, gradients, and material feel when absolutely necessary.
 - Rebuild text, cards, separators, arrows, and main geometry as editable PPT objects above it.
-- Keep the texture layer visibly controlled at the back; do not use it as a hidden full-slide screenshot substitute when editability is required.
+- Keep any texture layer visibly controlled at the back; do not use it as a hidden full-slide screenshot substitute.
 - Audit both full-pixel fidelity and a non-text/non-texture structure mask so noise does not dominate decisions.
 
 ## 3. Use A Template Model
@@ -221,7 +221,7 @@ For "improve while preserving template":
 - Similar memory records, if used, are treated as hints and not copied blindly.
 - Candidate render uses the same pixel size.
 - Visual audit metrics are attached.
-- Large old bitmap layer is removed from PPTX.
+- Source screenshot/bitmap layer is removed from PPTX.
 - Text and shapes are editable where the user expects editability.
 - Icons can remain PNG unless the user explicitly requests editable icons.
 - The final PPTX is next to the source PNG.
@@ -234,7 +234,7 @@ Current external options worth knowing:
 
 - SlideForge offers screenshot/photo/reference-image to editable PPTX using a vision LLM that identifies text, shapes, charts, and positions, then renders native PPTX. This confirms the right architecture for high fidelity: image understanding -> structured component spec -> native PPT renderer.
 - PPTAgent-style research uses an edit-based workflow with evaluation/reflection rather than one-shot generation. This supports a local loop of render -> visual audit -> edit.
-- PptxGenJS and python-pptx can insert PNG assets reliably. For exact visual restore, keep icons and complex graphics as PNG unless the user explicitly needs editable reconstruction.
+- PptxGenJS and python-pptx can render native PPT shapes reliably. Use them for editable text, geometry, connectors, cards, and tables.
 
 Local skill implementation should therefore mimic the robust parts:
 

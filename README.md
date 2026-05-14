@@ -1,11 +1,10 @@
 # png2ppt
 
-Codex skill for converting PNG images into PowerPoint decks and reconstructing PNG screenshots as editable PPT content.
+Codex skill for reconstructing PNG screenshots or slide images as editable PowerPoint content.
 
-The skill supports two practical modes:
+The skill has one delivery mode:
 
-- **Fidelity-first PNG placement:** fastest path and highest same-look fidelity.
-- **Editable or hybrid reconstruction:** rebuilds text, layout lines, panels, cards, tables, and flow geometry as native PPT objects while using PNG assets for icons or complex art.
+- **Editable native PPT reconstruction:** rebuild text, layout lines, panels, cards, tables, and flow geometry as native PPT objects. Icons and decorative art may be simplified or semantically replaced, but the source PNG must not be delivered as a full-slide picture.
 
 It is designed for iterative, visual-diff-driven work instead of one-shot guessing: profile the source image, build a candidate PPTX, render it, audit the render against the source PNG, then compare metrics against a saved baseline.
 
@@ -33,14 +32,14 @@ npx skills add qqbinbinbin/png2ppt --list
 
 Use this skill when you need to:
 
-- Turn PNG screenshots or slide images into `.pptx`.
+- Turn PNG screenshots or slide images into editable `.pptx`.
 - Reconstruct key slide content as editable PowerPoint objects.
 - Preserve layout, lines, cards, panels, tables, and flow diagrams.
 - Rebuild dense consulting-style PPT pages with blue corporate grids, badges, cards, process steps, arrows, and footer strips.
-- Use PNG icon-library replacements when icon editability is not important.
+- Use simple semantic icon replacements when icon editability is not important.
 - Audit visual fidelity and prove that an iteration did not regress.
 
-If exact visual sameness is more important than editability, place the PNG into the PPTX. If editability matters, use hybrid reconstruction and validate with render/audit metrics.
+The final PPTX must not be a source-image-backed deck. A screenshot layer can be used only as a temporary local reference and must be removed before delivery.
 
 ## Output Layout
 
@@ -68,12 +67,6 @@ Create standard job paths:
 
 ```bash
 python3 scripts/init_job.py image1.png --root ./png2ppt
-```
-
-Create a simple image-backed PPTX:
-
-```bash
-python3 scripts/images_to_ppt.py --output image1.pptx --fit contain image1.png
 ```
 
 Profile an image before reconstruction:
@@ -112,7 +105,7 @@ The skill treats visual quality as measurable:
 - Check pixel difference, edge/line IoU, missing structure, extra structure, and package hygiene.
 - Run regression comparison when changing scripts or reconstruction strategy.
 
-This does not guarantee perfect native PPT reconstruction. PowerPoint text rendering, antialiasing, shadows, gradients, and icon detail can differ from the source image. The point is to make those differences visible, measurable, and improvable.
+This does not guarantee perfect pixel-level reconstruction. PowerPoint text rendering, antialiasing, shadows, gradients, and icon detail can differ from the source image. The point is to keep the result editable while making differences visible, measurable, and improvable.
 
 ## Repository Maintenance
 

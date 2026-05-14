@@ -1,39 +1,39 @@
 ---
 name: png2ppt
-description: Convert PNG images into PowerPoint decks or reconstruct PNG screenshots as editable PPT content. Use when working with .pptx files, PNG screenshots, image-to-PPT reconstruction, high-fidelity line/layout restoration, visual-diff-driven PPT reconstruction, or choosing between fidelity-first PNG placement and editability-first native PPT reconstruction.
+description: Reconstruct PNG screenshots or slide images as editable PowerPoint content. Use when working with PNG-to-PPTX reconstruction, editable text/shapes, high-fidelity line/layout restoration, component-spec generation, and visual-diff-driven native PPT reconstruction.
 ---
 
 # png2ppt
 
 ## Decision Rule
 
-Default to **fidelity-first PNG placement** when the user wants the slide to look the same quickly, especially for screenshots, complex illustrations, gradients, shadows, charts, and icon-library assets where editability is not required.
+This skill has one delivery mode: **editable native PPT reconstruction**.
 
-Use **native PPT reconstruction** when the user needs editable text, lines, panels, cards, tables, flow nodes, or other layout geometry and accepts slower manual/scripted reconstruction.
+Do not create a PPTX by inserting the source PNG as a full-slide picture. A full-slide screenshot layer is only allowed as a temporary reference during local analysis and must not remain in the final deliverable.
 
-For bitmap-backed slide reconstruction, use a hybrid: editable PPT text/shapes for layout and PNG icons for semantic icon replacements.
+Rebuild text, lines, panels, cards, tables, flow nodes, and other layout geometry as editable PPT objects. Icons and decorative artwork may be simplified into editable symbols or replaced by small semantic assets only when they are not the page's editable substance; never use the original full-page PNG as the delivered content.
 
 ## Fidelity Answer
 
-PNG placement has the highest same-look fidelity in PowerPoint because it preserves rendered pixels. Native PPT reconstruction improves editability but can reduce visual parity because fonts, shadows, antialiasing, and icon details render differently.
+Editable native PPT reconstruction improves editability but can reduce pixel-perfect parity because PowerPoint renders fonts, shadows, antialiasing, and icon details differently from the source image.
 
 Practical ranking:
 
-1. **Highest same-look fidelity:** high-resolution PNG in PPT.
-2. **Best editable layout:** native PPT shapes/text rebuilt by hand or script, with PNG icons for speed and stability.
-3. **Best compromise:** hybrid reconstruction: editable structure plus selected PNG assets where exact editability is not needed.
+1. **Required final mode:** native PPT shapes/text for the slide structure and text.
+2. **Allowed shortcut:** small semantic icon/art assets only when icon editability is not required.
+3. **Forbidden final mode:** source PNG placed as the slide content.
 
 ## Workflow
 
-1. Inspect the source: decide whether the user values visual fidelity, editability, file size, or speed.
+1. Inspect the source: identify editable text, structural geometry, icons, decorative art, and complex bitmap regions.
 2. Initialize the output layout before creating artifacts: the final PPTX goes next to the source PNG; all rounds, audits, specs, logs, previews, and temporary renders go under `png2ppt/<job-name>/work/`.
 3. Create a style profile before reconstruction. Use `scripts/style_profile.py` to extract background, palette, edge density, line density, content blocks, text blocks, and a first-pass strategy recommendation.
 4. Query style memory when available. Use similar previous profiles as hints, not as a template override.
 5. Lock the validation scope. If the source image is embedded in PPTX, extract that exact bitmap instead of comparing full-slide previews.
-6. For slide reconstruction: keep headings, text, panels, lines, tables, and flow nodes as editable PPT objects; use PNG for icons/complex art.
+6. For slide reconstruction: keep headings, text, panels, lines, tables, and flow nodes as editable PPT objects; simplify or semantically replace icons when needed.
 7. Reconstruct structure before icons: canvas, panels, borders, separators, dotted lines, dividers, then text and icons.
 8. When icons do not need editing, use PNG icon-library semantic replacements and spend iteration budget on editable structure and typography.
-9. Remove the old screenshot/bitmap layer and prune stale media/relationships from the PPTX package.
+9. Remove any source screenshot/bitmap layer and prune stale media/relationships from the PPTX package.
 10. Run visual fidelity audit and iterate until structure metrics pass or remaining failures are explicitly explained.
 11. Record the run in both the job report and style memory so future runs can retrieve strategy/metric lessons from similar images.
 
@@ -45,7 +45,7 @@ For editable or hybrid reconstruction, use this loop:
 
 1. **Profile:** run `style_profile.py` and save `work/specs/style_profile.json`.
 2. **Retrieve:** run `style_memory.py nearest` to find similar previous profiles when memory exists.
-3. **Plan:** choose `fidelity_png_placement`, `simple_native_reconstruction`, `hybrid_reconstruction`, `native_or_hybrid_reconstruction`, or `texture_backed_hybrid_reconstruction` from the profile plus user requirements.
+3. **Plan:** choose `simple_native_reconstruction`, `hybrid_reconstruction`, `native_or_hybrid_reconstruction`, `consulting_blueprint_hybrid_reconstruction`, or `texture_backed_hybrid_reconstruction` from the profile plus user requirements.
 4. **Spec:** create a region/component spec from the image's detected layout. Keep it data-driven where possible.
 5. **Render:** generate a PPTX candidate and a normalized PNG render.
 6. **Audit:** run visual fidelity and PPTX package checks.
@@ -105,17 +105,6 @@ Use `scripts/init_job.py` to create and print the standard paths:
 python3 /path/to/png2ppt/scripts/init_job.py image1.png --root ./png2ppt
 ```
 
-Use `scripts/images_to_ppt.py` to build a simple deck from PNG files:
-
-```bash
-python3 /path/to/png2ppt/scripts/images_to_ppt.py \
-  --output image1.pptx \
-  --fit contain \
-  image1.png
-```
-
-The script only accepts PNG input. It does not convert SVG or other vector formats.
-
 Use `scripts/visual_fidelity_audit.py` to compare a reference image and candidate render:
 
 ```bash
@@ -173,7 +162,9 @@ python3 - <<'PY'
 from pptx import Presentation
 prs = Presentation("output.pptx")
 for i, s in enumerate(prs.slides, 1):
-    print(i, len(s.shapes), sum(1 for sh in s.shapes if sh.shape_type == 13))
+    pictures = sum(1 for sh in s.shapes if sh.shape_type == 13)
+    text = sum(1 for sh in s.shapes if getattr(sh, "has_text_frame", False) and sh.text_frame.text.strip())
+    print(i, len(s.shapes), pictures, text)
 PY
 ```
 
@@ -189,13 +180,12 @@ PY
 
 ## Notes
 
-- If the user says “不需要编辑图标/快速实现”, use PNG icons.
-- If the user says “高保真”, prefer PNG placement unless they also require editable PPT objects.
-- If the user says “可编辑”, rebuild key content as text/shapes and keep complex art/icons as PNG unless editability is required.
+- If the user says “不需要编辑图标/快速实现”, simplify icons or use small semantic replacements; do not insert the source slide PNG.
+- If the user says “高保真”, improve native structure, typography, and line geometry; do not use full-slide PNG placement as the final deliverable.
+- If the user says “可编辑”, rebuild key content as text/shapes and keep complex art/icons simplified unless editability is required.
 - If the user dislikes fidelity, run the visual audit and fix structural drift/typography before changing icon strategy.
 - Normalize rendered PPT previews to the reference bitmap dimensions before audit; some renderers add 1-2 pixels to thumbnail height.
 - If the user asks for PPT beautification, use the installed `elite-powerpoint-designer` skill after structural fidelity is acceptable; beautification must not break the reference grid unless the user allows redesign.
 - For rail/overflow/layout verification ideas, adapt the installed `pptx-html-fidelity-audit` skill's geometry-first discipline even when the source is an image rather than HTML.
 
-For deeper tradeoffs, read `references/fidelity.md`.
 For iterative high-fidelity reconstruction, read `references/reconstruction-loop.md`.
