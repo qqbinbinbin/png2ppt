@@ -17,7 +17,7 @@ Run these checks before committing skill changes:
 
 ```bash
 python3 -m py_compile scripts/*.py
-python3 /Users/hawk/.codex/skills/.system/skill-creator/scripts/quick_validate.py .
+npx skills add . --list
 ```
 
 For reconstruction behavior changes, also rerun at least one saved sample and compare:

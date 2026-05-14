@@ -119,7 +119,7 @@ python3 scripts/regression_compare.py \
 
 ```bash
 python3 -m py_compile scripts/*.py
-python3 /Users/hawk/.codex/skills/.system/skill-creator/scripts/quick_validate.py .
+npx skills add . --list
 ```
 
 不要提交用户交付物、样例工作目录、渲染预览或项目专用重建脚本。可复用流程放在本仓库，一次性的页面坐标和模板脚本放在用户项目工作区。

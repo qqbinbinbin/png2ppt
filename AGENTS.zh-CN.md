@@ -17,7 +17,7 @@
 
 ```bash
 python3 -m py_compile scripts/*.py
-python3 /Users/hawk/.codex/skills/.system/skill-creator/scripts/quick_validate.py .
+npx skills add . --list
 ```
 
 如果变更影响重建行为，还要至少重跑一个已保存样例并做回归对比：

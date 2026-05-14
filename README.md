@@ -119,7 +119,7 @@ Validate skill changes before committing:
 
 ```bash
 python3 -m py_compile scripts/*.py
-python3 /Users/hawk/.codex/skills/.system/skill-creator/scripts/quick_validate.py .
+npx skills add . --list
 ```
 
 Do not commit user deliverables, sample work directories, rendered previews, or project-specific slide rebuilders. Keep reusable workflows in this repository and one-off reconstruction scripts in the user's project workspace.
