@@ -98,6 +98,55 @@ For a commercial/publishable workflow, prefer a neutral component spec over ad h
 
 Project-specific scripts may translate this spec into `python-pptx`, PptxGenJS, or another renderer. The skill should keep the spec/audit loop generic.
 
+## 3.1. Reverse Extraction Plus Forward Normalization
+
+When the user explicitly allows "神似" or says a cleaner generated PPT is acceptable, add a forward design pass after the component spec and before PPT rendering.
+
+The pass has a narrow purpose: make the editable PPT more regular and commercially usable without changing the source argument.
+
+Use the reverse pass to determine:
+
+- page type and diagram type;
+- region count and reading order;
+- title, subtitle, conclusion, and section labels;
+- card/table/flow/roadmap geometry;
+- original palette and density.
+
+Use the forward pass to normalize:
+
+- equivalent card sizes and baselines;
+- grid gutters and internal padding;
+- repeated line widths, border colors, corner radii, and arrowheads;
+- typography hierarchy and text fit;
+- semantic icon family.
+
+Do not normalize away important differences. If one card is intentionally larger, one connector is emphasized, or one quadrant is visually dominant, preserve that semantic emphasis.
+
+Record intentional normalization separately from errors:
+
+```json
+{
+  "intentional_normalization": [
+    "Aligned five step cards to common top/bottom baselines",
+    "Replaced mixed icon artwork with semantic blue linear icons"
+  ],
+  "remaining_errors": [
+    "Decorative skyline simplified",
+    "Exact CJK font rendering differs from source PNG"
+  ]
+}
+```
+
+For this mode, visual audit metrics are guardrails, not the only score. A candidate can be better than the PNG while scoring slightly worse on raw pixels, but it must still pass semantic and structural review.
+
+Use three explicit gates:
+
+- **Semantic gate:** same message, title/conclusion intent, reading order, content density, and diagram type.
+- **Structural gate:** major regions, cards/tables/flows, line rails, badges, and footer remain recognizably aligned to the source. Prefer blue/non-text structure overlays over raw OCR/text edge scores when icon or typography exactness is intentionally relaxed.
+- **Editability gate:** final PPTX contains editable shapes/text and no full-slide source screenshot or stale large media.
+
+If raw pixel metrics fail because of text rendering, icon substitution, or intentional grid cleanup, report that as a normalization impact. Do not call the output pixel-perfect.
+
 ## 4. Audit Every Iteration
 
 Run:

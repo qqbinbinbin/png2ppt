@@ -17,6 +17,7 @@ png2ppt-quality-check = "scripts.pptx_quality_check:main"
 png2ppt-regression-compare = "scripts.regression_compare:main"
 png2ppt-style-memory = "scripts.style_memory:main"
 png2ppt-style-profile = "scripts.style_profile:main"
+png2ppt-spec-normalize = "scripts.spec_normalize:main"
 png2ppt-visual-audit = "scripts.visual_fidelity_audit:main"
 
 [tool.setuptools]

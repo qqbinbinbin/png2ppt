@@ -8,6 +8,10 @@
 
 这个 skill 的核心不是一次性猜测，而是可验证迭代：先分析源图，再生成候选 PPTX，渲染成图片，与源 PNG 做视觉审计，最后用基线指标判断是否退化。
 
+当用户接受“神似但更规整”，而不是严格像素级复刻时，使用“反向提取 + 正向规范化”：保留源图的信息结构和论证逻辑，再改善网格对齐、组件节奏、字体适配、线型规范和图标一致性，最后生成可编辑 PPTX。
+
+在这个模式下，像素指标是诊断工具，不是唯一验收标准。必须同时检查语义一致、结构一致和 PPT 可编辑性。
+
 ## 安装
 
 从 GitHub 直接安装。即使 `skills.sh` 搜索暂时还没有收录仓库，这条命令也可以使用：
@@ -75,6 +79,16 @@ python3 scripts/init_job.py image1.png --root ./png2ppt
 python3 scripts/style_profile.py \
   image1.png \
   --out png2ppt/image1/work/specs/style_profile.json
+```
+
+渲染前对已提取的组件规格做正向规范化：
+
+```bash
+python3 scripts/spec_normalize.py \
+  png2ppt/image1/work/specs/extracted_spec.json \
+  --out png2ppt/image1/work/specs/normalized_spec.json \
+  --grid 4 \
+  --icon-mode semantic_png
 ```
 
 对候选渲染图做视觉审计：

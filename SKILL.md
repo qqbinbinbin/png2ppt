@@ -67,14 +67,59 @@ For editable or hybrid reconstruction, use this loop:
 
 1. **Profile:** run `style_profile.py` and save `work/specs/style_profile.json`.
 2. **Retrieve:** run `style_memory.py nearest` to find similar previous profiles when memory exists.
-3. **Plan:** choose `simple_native_reconstruction`, `hybrid_reconstruction`, `native_or_hybrid_reconstruction`, `consulting_blueprint_hybrid_reconstruction`, or `texture_backed_hybrid_reconstruction` from the profile plus user requirements.
+3. **Plan:** choose `simple_native_reconstruction`, `hybrid_reconstruction`, `native_or_hybrid_reconstruction`, `consulting_blueprint_hybrid_reconstruction`, `texture_backed_hybrid_reconstruction`, or `reverse_extract_then_forward_normalize` from the profile plus user requirements.
 4. **Spec:** create a region/component spec from the image's detected layout. Keep it data-driven where possible.
-5. **Render:** generate a PPTX candidate and a normalized PNG render.
-6. **Audit:** run visual fidelity and PPTX package checks.
-7. **Improve:** change geometry, text fit, line widths, and structural tokens before changing icons.
-8. **Remember:** append decision, metrics, and the next improvement to style memory.
+5. **Normalize:** when the user accepts "神似" or design improvement over exact copying, pass the spec through a forward design system: snap grids, normalize repeated components, harmonize typography, standardize icon style, and preserve the original business meaning.
+6. **Render:** generate a PPTX candidate and a normalized PNG render.
+7. **Audit:** run visual fidelity and PPTX package checks.
+8. **Improve:** change geometry, text fit, line widths, and structural tokens before changing icons.
+9. **Remember:** append decision, metrics, and the next improvement to style memory.
 
 The memory is guidance, not truth. If a new PNG has a different palette, density, aspect ratio, or information architecture, profile it and derive a new spec instead of copying an old layout.
+
+## Forward-Normalized Reconstruction
+
+Use `reverse_extract_then_forward_normalize` when the user wants an editable PPT that is recognizably based on the PNG, but allows the generated PPT to be cleaner or more professional than a strict pixel copy.
+
+This mode is not a redesign license. It has two gates:
+
+1. **Semantic gate:** the title, conclusion, section order, content density, diagram type, and management argument must remain the same.
+2. **Structural gate:** major regions, cards, tables, connectors, badges, footers, and visual hierarchy must remain close enough that the page is clearly the same artifact.
+
+Allowed improvements:
+
+- align repeated cards, rows, and dividers to a consistent grid;
+- normalize line widths, corner radii, arrowheads, gutters, and icon sizes;
+- replace inconsistent or low-quality icons with a coherent semantic icon set;
+- improve text fit and hierarchy while preserving the same content;
+- simplify noisy decorative art into controlled background textures when it is not the editable substance.
+
+Not allowed:
+
+- converting dense consulting material into a sparse marketing slide;
+- changing a matrix, flow, architecture, or roadmap into a different diagram type without a content reason;
+- removing content to improve visual cleanliness;
+- using the source PNG as a hidden full-slide background in the final deliverable.
+
+When reporting this mode, separate **intentional normalization** from **remaining reconstruction error**.
+
+Use `scripts/spec_normalize.py` when a component spec already exists and the next step is a controlled forward-design pass:
+
+```bash
+python3 /path/to/png2ppt/scripts/spec_normalize.py \
+  png2ppt/image1/work/specs/extracted_spec.json \
+  --out png2ppt/image1/work/specs/normalized_spec.json \
+  --grid 4 \
+  --icon-mode semantic_png
+```
+
+For this mode, do not use the default high-fidelity pixel gates as the only acceptance decision. Report them, but judge the candidate with three checks:
+
+- **Semantic check:** same message, title/conclusion intent, reading order, and diagram type.
+- **Structural check:** major regions, cards/tables/flows, line rails, badges, and footer remain recognizably aligned to the source; `blue_structure_iou` and non-text structure overlays are more informative than raw text edges.
+- **Editability check:** PPT package has editable shapes/text and no full-slide source screenshot or stale large media.
+
+If raw `edge_iou` fails because text rendering, icon replacement, or deliberate grid cleanup changed pixels, label that as normalization impact rather than claiming pixel-perfect fidelity.
 
 ## Consulting Blueprint Style
 
@@ -95,6 +140,8 @@ Useful skill patterns from the open skills ecosystem:
 - **PPTX QA discipline:** render slides to images and check for placeholder text, overlap, text overflow, low contrast, stale large media, and package hygiene.
 - **Design-system extraction:** convert each PNG into tokens before drawing: colors, fonts, spacing, radius, shadow, stroke, density, and component rhythm.
 - **Theme factory:** classify the visual style before rendering. Generate/apply a coherent theme such as blue corporate, dark technical, warm editorial, or minimal grayscale.
+- **Structured slide specs:** use YAML/JSON-style slide descriptions as the handoff between visual analysis and PPT generation. This pattern appears in several PPT-generation skills and is more stable than ad hoc coordinate drawing.
+- **Forward design pass:** after reverse extraction, apply a template/design-system pass that improves alignment and visual hierarchy without changing the content semantics.
 - **OCR-first reconstruction:** use OCR/text ROI extraction for text boxes and line wrapping instead of relying on manual transcription or guessed positions.
 - **Texture-backed hybrid:** for dark, photographic, noisy, glassy, or gradient-heavy slides, keep layout/text/cards editable but add a controlled PNG texture/background layer so pixel and structure metrics are not destroyed by flat native shapes.
 - **Final polish pass:** after metrics improve, run a focused pass on spacing, type fit, line weights, contrast, and clipping before delivery.

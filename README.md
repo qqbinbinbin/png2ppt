@@ -8,6 +8,10 @@ The skill has one delivery mode:
 
 It is designed for iterative, visual-diff-driven work instead of one-shot guessing: profile the source image, build a candidate PPTX, render it, audit the render against the source PNG, then compare metrics against a saved baseline.
 
+When the user accepts "same spirit, cleaner form" instead of strict pixel copying, use reverse extraction plus forward normalization: preserve the source message and structure, then improve grid alignment, component rhythm, typography fit, line tokens, and icon consistency before rendering the editable PPTX.
+
+In this mode, pixel metrics are diagnostics, not the sole acceptance rule. Always pair them with semantic, structural, and editability checks.
+
 ## Install
 
 Install from the public GitHub repository. This direct-install command works even before `skills.sh` search indexes the repository:
@@ -75,6 +79,16 @@ Profile an image before reconstruction:
 python3 scripts/style_profile.py \
   image1.png \
   --out png2ppt/image1/work/specs/style_profile.json
+```
+
+Normalize an extracted component spec before rendering:
+
+```bash
+python3 scripts/spec_normalize.py \
+  png2ppt/image1/work/specs/extracted_spec.json \
+  --out png2ppt/image1/work/specs/normalized_spec.json \
+  --grid 4 \
+  --icon-mode semantic_png
 ```
 
 Audit a rendered candidate against the source image:
