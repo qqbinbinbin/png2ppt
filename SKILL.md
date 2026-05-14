@@ -54,6 +54,18 @@ For editable or hybrid reconstruction, use this loop:
 
 The memory is guidance, not truth. If a new PNG has a different palette, density, aspect ratio, or information architecture, profile it and derive a new spec instead of copying an old layout.
 
+## Consulting Blueprint Style
+
+When `style_profile.py` reports `style_family.name = consulting_blueprint` or `primary = consulting_blueprint_hybrid_reconstruction`, treat the page as a dense consulting PPT template:
+
+- Preserve the fixed 16:9 grid, margins, title area, side badge, page counter, skyline/decorative art, cards, arrows, numbered steps, and footer conclusion/output strip.
+- Rebuild title, subtitles, section labels, cards, tables, dividers, arrows, and numbered flow nodes as editable PPT text/shapes.
+- Use PNG assets for icons, decorative skyline/building artwork, glow textures, and other non-critical illustrations.
+- Extract a reusable theme from the sample set: deep navy title/strokes, blue accents, light-blue fills, white canvas, thin blue-gray borders, and compact CJK typography.
+- Build from a component spec (`theme`, `regions`, `components`, `connectors`, `footer`) before drawing individual objects.
+- Spend iteration budget on line/table geometry, row heights, column boundaries, arrow positions, and footer strips before icon exactness.
+- For 100+ page batches, process 3-5 representative pages first, save profiles/audits/regression reports, then reuse the detected theme and component primitives for the rest.
+
 ## Quality Methods To Borrow
 
 Useful skill patterns from the open skills ecosystem:

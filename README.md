@@ -36,6 +36,7 @@ Use this skill when you need to:
 - Turn PNG screenshots or slide images into `.pptx`.
 - Reconstruct key slide content as editable PowerPoint objects.
 - Preserve layout, lines, cards, panels, tables, and flow diagrams.
+- Rebuild dense consulting-style PPT pages with blue corporate grids, badges, cards, process steps, arrows, and footer strips.
 - Use PNG icon-library replacements when icon editability is not important.
 - Audit visual fidelity and prove that an iteration did not regress.
 

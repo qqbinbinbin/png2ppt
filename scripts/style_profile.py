@@ -231,6 +231,71 @@ def entropy_from_colors(colors: list[dict]) -> float:
     return float(entropy)
 
 
+def classify_style_family(metrics: dict) -> dict:
+    size = metrics["size"]
+    density = metrics["density"]
+    palette = metrics["palette"]
+    layout = metrics["layout"]
+    background = metrics["background"]
+    family = palette.get("family_ratios", {})
+
+    line_count = layout["horizontal_line_count"] + layout["vertical_line_count"]
+    aspect = size["aspect_ratio"]
+    blue_ratio = family.get("blue", 0.0)
+    neutral_ratio = family.get("neutral", 0.0)
+    consulting_signals = [
+        background.get("is_light"),
+        1.70 <= aspect <= 1.85,
+        density["content_area_ratio"] >= 0.88,
+        0.12 <= density["edge_density"] <= 0.20,
+        density["line_density"] >= 2.8,
+        density["non_background_ratio"] >= 0.16,
+        density["dark_ratio"] >= 0.12,
+        blue_ratio >= 0.55,
+        neutral_ratio <= 0.35,
+        line_count >= 45,
+        layout["content_block_count"] >= 35,
+        layout["text_block_count"] >= 90,
+    ]
+    consulting_score = sum(1 for item in consulting_signals if item) / len(consulting_signals)
+    if consulting_score >= 0.75:
+        return {
+            "name": "consulting_blueprint",
+            "confidence": round(consulting_score, 3),
+            "reason": "light 16:9 consulting slide with dense blue structural layout, many lines/cards, and high text density",
+            "tokens": [
+                "white canvas",
+                "deep-blue titles and section badges",
+                "light-blue cards and table rows",
+                "dense separators, arrows, and numbered steps",
+                "footer conclusion/output strip",
+            ],
+        }
+
+    if background.get("is_dark") and palette["entropy"] >= 2.2 and density["edge_density"] >= 0.10:
+        return {
+            "name": "dark_technical",
+            "confidence": 0.7,
+            "reason": "dark structured page with textured/high-entropy foreground",
+            "tokens": ["dark background", "muted text", "technical cards", "glow or texture"],
+        }
+
+    if background.get("is_light") and line_count >= 8 and layout["content_block_count"] >= 10:
+        return {
+            "name": "structured_corporate",
+            "confidence": 0.6,
+            "reason": "light structured corporate slide with editable geometry",
+            "tokens": ["light canvas", "structured panels", "rules", "cards"],
+        }
+
+    return {
+        "name": "general",
+        "confidence": 0.4,
+        "reason": "no strong reusable style-family signal detected",
+        "tokens": [],
+    }
+
+
 def recommend_strategy(metrics: dict) -> dict:
     density = metrics["density"]
     palette = metrics["palette"]
@@ -243,8 +308,13 @@ def recommend_strategy(metrics: dict) -> dict:
     block_count = layout["content_block_count"]
     entropy = palette["entropy"]
     family = palette.get("family_ratios", {})
+    style_family = metrics.get("style_family") or classify_style_family(metrics)
 
-    if background.get("is_dark") and entropy >= 2.2 and edge_density >= 0.10 and family.get("neutral", 0) >= 0.35:
+    if style_family["name"] == "consulting_blueprint":
+        primary = "consulting_blueprint_hybrid_reconstruction"
+        reason = "consulting blueprint slide: preserve grid, cards, arrows, badges, table rows, and footer strips as editable geometry; keep icons and decorative skyline assets as PNG"
+        editable_priority = "high"
+    elif background.get("is_dark") and entropy >= 2.2 and edge_density >= 0.10 and family.get("neutral", 0) >= 0.35:
         primary = "texture_backed_hybrid_reconstruction"
         reason = "dark textured structured page; editable overlay should be combined with a low-opacity/cropped texture or background layer"
         editable_priority = "medium_high"
@@ -269,6 +339,7 @@ def recommend_strategy(metrics: dict) -> dict:
         "primary": primary,
         "editable_priority": editable_priority,
         "reason": reason,
+        "style_family": style_family,
         "first_pass": [
             "lock source dimensions and output paths",
             "build a region/component spec before drawing",
@@ -349,6 +420,7 @@ def profile_image(path: Path) -> dict:
             "text_blocks": text_blocks[:40],
         },
     }
+    metrics["style_family"] = classify_style_family(metrics)
     metrics["recommendation"] = recommend_strategy(metrics)
     metrics["vector_features"] = {
         "aspect_ratio_scaled": min(1.0, (w / h) / 4.0),

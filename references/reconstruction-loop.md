@@ -133,6 +133,27 @@ Changing icon libraries can lower `edge_iou` while improving semantic usefulness
 
 If the user lowers font/style consistency priority, add a **non-text structure mask** for decision-making. Exclude title/body/list text ROIs and score only panels, borders, separators, cards, flow nodes, orbit guides, blue pills, and structural marks. Use this score to pick geometry changes, while still reporting the standard audit separately.
 
+## 4.1. Consulting Blueprint Pages
+
+For dense consulting PPT pages, `style_profile.py` may classify the page as `consulting_blueprint`. This style is typically a white 16:9 canvas with deep-blue title hierarchy, a dark left chapter badge, pale-blue cards/tables, many thin separators, numbered process steps, arrow connectors, and a footer conclusion/output strip.
+
+Use this reconstruction order:
+
+1. Detect global frame: left badge, title block, top-right page counter/skyline, body region, bottom strip.
+2. Extract the shared theme: deep navy, accent blue, light-blue fills, blue-gray borders, row fills, arrow fills, and footer blue.
+3. Convert line detections into grid primitives: rows, columns, card boundaries, section dividers, and connector rails.
+4. Rebuild cards/tables/steps as editable PPT shapes first, then text, then PNG icons/decorative art.
+5. Keep skyline/building art and icons as PNG unless the user explicitly asks to edit them.
+6. Audit line/table geometry separately from text style; for this style, structural fidelity matters more than exact icon artwork.
+
+For batches, do not hand-code every page. Create a small style benchmark set first, then reuse:
+
+- theme tokens,
+- badge/title/footer primitives,
+- card/table/step primitives,
+- icon PNG strategy,
+- regression thresholds for non-text structure.
+
 ## 5. Read The Audit Images
 
 `edge_overlay_ref_blue_candidate_red.png`:
