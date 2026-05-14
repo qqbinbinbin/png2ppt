@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# png2ppt job outputs belong next to source images or under job work dirs,
+# not in the skill repository.
+png2ppt/
+work/
+tmp/
+renders/
+audits/
+rounds/
+reports/
+logs/
+specs/
+*.pptx
+*.png

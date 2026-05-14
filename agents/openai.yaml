@@ -1,0 +1,3 @@
+display_name: png2ppt
+short_description: Convert PNG images into PowerPoint.
+default_prompt: Convert PNG assets or screenshots into a PowerPoint deck using the right fidelity/editability tradeoff.

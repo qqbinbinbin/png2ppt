@@ -1,0 +1,23 @@
+[project]
+name = "png2ppt-skill"
+version = "0.1.0"
+description = "Codex skill scripts for PNG-to-PowerPoint reconstruction, auditing, and regression checks."
+requires-python = ">=3.10"
+dependencies = [
+  "numpy",
+  "Pillow",
+  "python-pptx",
+  "scipy",
+]
+
+[project.scripts]
+png2ppt-images = "scripts.images_to_ppt:main"
+png2ppt-init-job = "scripts.init_job:main"
+png2ppt-quality-check = "scripts.pptx_quality_check:main"
+png2ppt-regression-compare = "scripts.regression_compare:main"
+png2ppt-style-memory = "scripts.style_memory:main"
+png2ppt-style-profile = "scripts.style_profile:main"
+png2ppt-visual-audit = "scripts.visual_fidelity_audit:main"
+
+[tool.setuptools]
+py-modules = []
