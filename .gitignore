@@ -23,3 +23,11 @@ logs/
 specs/
 *.pptx
 *.png
+
+# Private user asset libraries and local promoted candidates must never be
+# committed accidentally. Publishable assets require explicit user approval.
+assets/raw/
+assets/index/
+assets/extracted/
+assets/parts/
+assets/local/

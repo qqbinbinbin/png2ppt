@@ -10,6 +10,11 @@ This repository is the source of truth for the `png2ppt` Codex skill.
 - Do not add project-specific slide rebuilders to the published skill. Put one-off templates and coordinates in the user's project work directory.
 - Prefer data-driven profiling, render/audit loops, and regression comparison over subjective visual judgment.
 - When evolving the skill, update this GitHub repository first, then install or sync the skill from the repository.
+- Never commit private user asset sources such as `assets/raw/*.pptx` into this repository.
+- Extracted local parts from user-owned PPT assets belong in the user's project `assets/` directory by default, not in this skill repository.
+- Move extracted parts into the skill's `assets/` directory only when the user explicitly instructs that promotion and the asset is confirmed publishable.
+- For large private PPTX asset libraries, create progressive metadata indexes before extracting concrete parts.
+- Treat private-asset indexes as local work products unless the user explicitly approves publishing them.
 
 ## Validation
 
